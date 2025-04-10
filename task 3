@@ -1,0 +1,48 @@
+
+-- Create table for sales data
+CREATE TABLE sales_data (
+    InvoiceNo TEXT,
+    StockCode TEXT,
+    Description TEXT,
+    Quantity INTEGER,
+    InvoiceDate TEXT,
+    UnitPrice REAL,
+    CustomerID INTEGER,
+    Country TEXT
+);
+
+-- Query 1: Total revenue by country
+SELECT Country, SUM(Quantity * UnitPrice) AS TotalRevenue
+FROM sales_data
+GROUP BY Country
+ORDER BY TotalRevenue DESC;
+
+-- Query 2: Top 5 bestselling products
+SELECT Description, SUM(Quantity) AS TotalUnitsSold
+FROM sales_data
+GROUP BY Description
+ORDER BY TotalUnitsSold DESC
+LIMIT 5;
+
+-- Query 3: Average order value per invoice
+SELECT InvoiceNo, SUM(Quantity * UnitPrice) AS OrderValue
+FROM sales_data
+GROUP BY InvoiceNo;
+
+-- Query 4: Customers with most orders
+SELECT CustomerID, COUNT(DISTINCT InvoiceNo) AS NumOrders
+FROM sales_data
+WHERE CustomerID IS NOT NULL
+GROUP BY CustomerID
+ORDER BY NumOrders DESC
+LIMIT 5;
+
+-- Query 5: Create a view for order summary
+CREATE VIEW order_summary AS
+SELECT 
+    InvoiceNo,
+    CustomerID,
+    SUM(Quantity * UnitPrice) AS OrderTotal,
+    COUNT(*) AS ItemsInOrder
+FROM sales_data
+GROUP BY InvoiceNo, CustomerID;
