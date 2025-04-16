@@ -1,0 +1,32 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Simulate some monthly sales data for 2024
+data = {
+    'month': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    'total_revenue': [15000.50, 17480.20, 20045.00, 18550.75, 19000.50, 21000.00, 23000.50, 25000.75, 24000.00, 22000.30, 21500.00, 23000.00],
+    'total_orders': [120, 140, 160, 155, 165, 170, 180, 190, 185, 175, 160, 170]
+}
+
+# Create a DataFrame
+df = pd.DataFrame(data)
+
+# Plot
+fig, ax1 = plt.subplots(figsize=(10, 6))
+
+# Plot total revenue (line)
+ax1.plot(df['month'], df['total_revenue'], color='blue', label='Total Revenue', marker='o')
+ax1.set_xlabel('Month')
+ax1.set_ylabel('Revenue ($)', color='blue')
+ax1.tick_params(axis='y', labelcolor='blue')
+
+# Plot total orders (bar) on secondary y-axis
+ax2 = ax1.twinx()
+ax2.bar(df['month'], df['total_orders'], alpha=0.3, label='Total Orders', color='orange')
+ax2.set_ylabel('Orders', color='orange')
+ax2.tick_params(axis='y', labelcolor='orange')
+
+# Title and legends
+plt.title('Monthly Revenue and Order Volume (2024)')
+fig.tight_layout()
+plt.show()
