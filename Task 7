@@ -1,0 +1,98 @@
+import sqlite3
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Create and connect to the database
+conn = sqlite3.connect("sales_data.db")
+cursor = conn.cursor()
+
+# Create the sales table with a date column
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS sales (
+    id INTEGER PRIMARY KEY,
+    product TEXT,
+    quantity INTEGER,
+    price REAL,
+    sale_date TEXT
+)
+""")
+
+# Insert sample data with dates
+sales_data = [
+    ("Apple", 10, 0.5, "2025-04-01"),
+    ("Banana", 5, 0.2, "2025-04-02"),
+    ("Apple", 7, 0.5, "2025-04-03"),
+    ("Orange", 8, 0.7, "2025-04-01"),
+    ("Banana", 12, 0.2, "2025-04-05"),
+    ("Orange", 4, 0.7, "2025-04-07"),
+]
+
+cursor.executemany("INSERT INTO sales (product, quantity, price, sale_date) VALUES (?, ?, ?, ?)", sales_data)
+conn.commit()
+
+# Run SQL query and load into DataFrame
+query = """
+SELECT product,
+       SUM(quantity) AS total_qty,
+       SUM(quantity * price) AS revenue
+FROM sales
+GROUP BY product
+"""
+df = pd.read_sql_query(query, conn)
+conn.close()
+
+# Print the sales summary
+print("Sales Summary:")
+print(df)
+
+# Bar chart: Revenue by Product
+df.plot(kind='bar', x='product', y='revenue', color='orange', legend=False)
+plt.title("Revenue by Product")
+plt.ylabel("Revenue")
+plt.tight_layout()
+plt.savefig("sales_chart.png")
+plt.show()
+
+# Filter by product
+product_filter = "Apple"
+filtered_df = df[df["product"] == product_filter]
+print(f"Filtered Sales Summary for {product_filter}:")
+print(filtered_df)
+
+# Filter by quantity range
+min_qty = 10
+filtered_by_qty = df[df["total_qty"] >= min_qty]
+print(f"Products with total quantity >= {min_qty}:")
+print(filtered_by_qty)
+
+# Export Summary to Excel
+df.to_excel("sales_summary.xlsx", index=False)
+print("Exported sales summary to sales_summary.xlsx")
+
+# Pie chart for revenue distribution
+df.set_index("product")["revenue"].plot.pie(
+    autopct='%1.1f%%', startangle=90, figsize=(6, 6), cmap='Pastel1'
+)
+plt.ylabel("")
+plt.title("Revenue Distribution by Product")
+plt.tight_layout()
+plt.savefig("sales_pie_chart.png")
+plt.show()
+
+# Optional: Filter by Date Range
+start_date = "2025-04-01"
+end_date = "2025-04-03"
+conn = sqlite3.connect("sales_data.db")
+query = f"""
+SELECT product,
+       SUM(quantity) AS total_qty,
+       SUM(quantity * price) AS revenue
+FROM sales
+WHERE sale_date BETWEEN '{start_date}' AND '{end_date}'
+GROUP BY product
+"""
+filtered_by_date_df = pd.read_sql_query(query, conn)
+conn.close()
+
+print(f"Sales Summary from {start_date} to {end_date}:")
+print(filtered_by_date_df)
