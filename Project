@@ -1,0 +1,48 @@
+from fpdf import FPDF
+
+# Create PDF class
+class PDF(FPDF):
+    def header(self):
+        self.set_font("Arial", "B", 12)
+        self.cell(0, 10, "Sales Analysis for an E-commerce Company", ln=True, align="C")
+        self.ln(5)
+
+    def chapter_title(self, title):
+        self.set_font("Arial", "B", 11)
+        self.cell(0, 10, title, ln=True, align="L")
+        self.ln(2)
+
+    def chapter_body(self, body):
+        self.set_font("Arial", "", 10)
+        self.multi_cell(0, 8, body)
+        self.ln()
+
+# Report content
+report = {
+    "Introduction": "This project involves analyzing sales data from an e-commerce company to uncover trends, understand customer behavior, and identify high-performing products and regions.",
+    "Abstract": "Using Python and data visualization tools, we conducted exploratory data analysis (EDA) on a public e-commerce sales dataset. The goal was to gain actionable insights into product sales, seasonal trends, and customer segmentation to inform business decisions.",
+    "Tools Used": "Python (Pandas, Matplotlib, Seaborn), Jupyter Notebook, Excel, SQL (for queries), and Power BI (for visualizations).",
+    "Steps Involved in Building the Project": (
+        "1. Data Collection: A public dataset was downloaded from Kaggle.\n"
+        "2. Data Cleaning: Missing values were handled, duplicates removed, and columns standardized.\n"
+        "3. Exploratory Data Analysis: Visualizations and summaries were created to explore sales trends.\n"
+        "4. Product & Customer Analysis: Identified top products, customer behavior, and seasonal patterns.\n"
+        "5. Visualization: Power BI dashboards were developed to display findings interactively."
+    ),
+    "Conclusion": "The analysis revealed key insights such as best-selling products, peak sales months, and high-value customer segments. These insights can help in optimizing inventory, targeting promotions, and improving customer retention."
+}
+
+# Create PDF
+pdf = PDF()
+pdf.add_page()
+
+# Add content
+for section, content in report.items():
+    pdf.chapter_title(section)
+    pdf.chapter_body(content)
+
+# Save PDF
+output_path = "/mnt/data/Sales_Analysis_Project_Report.pdf"
+pdf.output(output_path)
+
+output_path
